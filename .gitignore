@@ -1,0 +1,21 @@
+# Compiled Go binaries and diagnostics
+bin/
+logs/
+*.log
+*.log.*
+
+# Temporary Go Mobile archives
+*.aar
+
+# Gradle & Android build caches
+.gradle/
+build/
+android_wrapper/.gradle/
+android_wrapper/build/
+android_wrapper/app/build/
+android_wrapper/app/libs/*.aar
+local.properties
+
+# Explicitly track releases directory and release APKs
+!releases/
+!releases/*.apk
