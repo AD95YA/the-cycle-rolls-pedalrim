@@ -26,8 +26,8 @@
   - `documents/03_PROMPTS_AND_DECISIONS.md` — Archive of design prompts, title/roster decisions, and architectural notes.
   - `documents/04_COMMAND_HISTORY.md` — **MANDATORY AUTO-UPDATE:** After every agent turn or terminal execution, append a timestamped entry logging the exact shell commands executed, flags/parameters passed, exit status, and brief summary of files modified.
 
-## 6. GitHub Repository & APK Versioning Workflow (`https://github.com/abhokarikar`)
-- **Remote Repository:** `https://github.com/abhokarikar/the-cycle-rolls-pedalrim`
+## 6. GitHub Repository & APK Versioning Workflow (`https://github.com/AD95YA`)
+- **Remote Repository:** `https://github.com/AD95YA/the-cycle-rolls-pedalrim`
 - **Commit & Push Cadence:** After completing every significant milestone (e.g., repo initialization, world & physics engine, marble economy & garage, unit tests, APK build), stage changes, write a clear conventional commit message (`feat:`, `test:`, `docs:`, `release:`), and push to `origin main`.
 - **APK Retention Policy (`releases/`):**
   - Keep separate permanent APK files for **major versions** (`releases/pedalrim-v1.apk`, `releases/pedalrim-v2.apk`, `releases/pedalrim-v3.apk`).

@@ -131,7 +131,7 @@ Roam the township to find interactive NPCs:
 ### Standalone Desktop PC Executable
 ```bash
 # Clone the repository
-git clone https://github.com/abhokarikar/the-cycle-rolls-pedalrim.git
+git clone https://github.com/AD95YA/the-cycle-rolls-pedalrim.git
 cd the-cycle-rolls-pedalrim
 
 # Compile standalone PC desktop executable

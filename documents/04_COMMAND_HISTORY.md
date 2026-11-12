@@ -90,9 +90,9 @@ All terminal commands executed during the development of **The Cycle Rolls: Peda
 - **Summary:** Cleaned up test run logs and created root `logs/` directory for runtime diagnostics.
 
 ### [2026-11-12T12:54:18Z] Git Repository Initialization & Remote Linking
-- **Command:** `git init -b main && git remote add origin https://github.com/abhokarikar/the-cycle-rolls-pedalrim.git`
+- **Command:** `git init -b main && git remote add origin https://github.com/AD95YA/the-cycle-rolls-pedalrim.git`
 - **Exit Status:** 0
-- **Summary:** Initialized git on `main` branch and linked remote `https://github.com/abhokarikar/the-cycle-rolls-pedalrim.git`.
+- **Summary:** Initialized git on `main` branch and linked remote `https://github.com/AD95YA/the-cycle-rolls-pedalrim.git`.
 
 ### [2026-11-12T13:03:16Z] Build & Publish Android APK (v1)
 - **Command:** `./scripts/build_and_release_apk.sh v1`
@@ -103,3 +103,8 @@ All terminal commands executed during the development of **The Cycle Rolls: Peda
 - **Command:** Created `README.md`
 - **Exit Status:** 0
 - **Summary:** Added comprehensive documentation covering game overview, controls, 6-speed derailleur mechanics, stamina/coasting physics, 4 neighborhood zones, 3-tier marble economy, Ship of Theseus garage upgrades, tips & tricks, build instructions, and the V2/V3 roadmap.
+
+### [2026-11-12T14:00:30Z] Redirect GitHub Remote & Update Author Username
+- **Command:** `git remote set-url origin https://github.com/AD95YA/the-cycle-rolls-pedalrim.git && git config user.name "AD95YA"`
+- **Exit Status:** 0
+- **Summary:** Updated git remote origin to `AD95YA` and updated user author name and documentation links across rules and README.
