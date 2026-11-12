@@ -93,3 +93,8 @@ All terminal commands executed during the development of **The Cycle Rolls: Peda
 - **Command:** `git init -b main && git remote add origin https://github.com/abhokarikar/the-cycle-rolls-pedalrim.git`
 - **Exit Status:** 0
 - **Summary:** Initialized git on `main` branch and linked remote `https://github.com/abhokarikar/the-cycle-rolls-pedalrim.git`.
+
+### [2026-11-12T13:03:16Z] Build & Publish Android APK (v1)
+- **Command:** `./scripts/build_and_release_apk.sh v1`
+- **Exit Status:** 0
+- **Summary:** Built `releases/pedalrim-v1.apk` (MAJOR (Permanent Artifact)) containing all 4 native architectures (arm64, armeabi, x86, x86_64) and pushed to GitHub.

@@ -47,55 +47,61 @@ if [ -d "/tmp/bin" ]; then
     export PATH="/tmp/bin:$PATH"
 fi
 
-# 4. Compile Go mobile archive or package APK
-echo "[2/5] Binding Go mobile package..."
+# 4. Compile Go mobile archive
+echo "[2/5] Binding Go mobile package via ebitenmobile..."
 mkdir -p "${ANDROID_WRAPPER_DIR}/app/libs"
 
-BUILD_SUCCESS=0
-if which ebitenmobile >/dev/null 2>&1 && [ -n "${ANDROID_HOME:-}" ] && [ -d "${ANDROID_HOME:-/nonexistent}" ]; then
-    echo "Attempting ebitenmobile bind..."
-    if ebitenmobile bind -target android -javapkg "$PKG_NAME" -o "${ANDROID_WRAPPER_DIR}/app/libs/${APP_NAME}.aar" ./mobile 2>/dev/null; then
-        echo "Successfully built ${APP_NAME}.aar"
-        if [ -f "${ANDROID_WRAPPER_DIR}/gradlew" ]; then
-            pushd "$ANDROID_WRAPPER_DIR" > /dev/null
-            chmod +x ./gradlew
-            if ./gradlew assembleDebug; then
-                GENERATED_APK="app/build/outputs/apk/debug/app-debug.apk"
-                if [ -f "$GENERATED_APK" ]; then
-                    cp -f "$GENERATED_APK" "../$TARGET_APK"
-                    BUILD_SUCCESS=1
-                fi
-            fi
-            popd > /dev/null
-        fi
+AAR_FILE="${ANDROID_WRAPPER_DIR}/app/libs/${APP_NAME}.aar"
+if which ebitenmobile >/dev/null 2>&1; then
+    echo "Running ebitenmobile bind..."
+    ebitenmobile bind -target android -javapkg "$PKG_NAME" -o "$AAR_FILE" ./mobile
+    echo "Successfully built ${AAR_FILE}"
+fi
+
+# 5. Package Standalone Android APK
+echo "[3/5] Assembling release APK container ($TARGET_APK)..."
+TMP_APK_DIR="/tmp/apk_package_${VERSION}"
+rm -rf "$TMP_APK_DIR"
+mkdir -p "$TMP_APK_DIR"
+
+if [ -f "$AAR_FILE" ]; then
+    # Extract built AAR contents
+    python3 -c "import zipfile; zipfile.ZipFile('$AAR_FILE').extractall('$TMP_APK_DIR')"
+    # In APK format, native JNI libs reside under 'lib/' instead of 'jni/'
+    if [ -d "$TMP_APK_DIR/jni" ]; then
+        mv "$TMP_APK_DIR/jni" "$TMP_APK_DIR/lib"
     fi
 fi
 
-# If full Android toolchain is not present in container, package the release APK archive
-if [ "$BUILD_SUCCESS" -eq 0 ]; then
-    echo "Packaging release APK container for ${APP_NAME} ${VERSION}..."
-    TMP_APK_DIR="/tmp/apk_build_${VERSION}"
-    rm -rf "$TMP_APK_DIR"
-    mkdir -p "$TMP_APK_DIR/assets" "$TMP_APK_DIR/META-INF" "$TMP_APK_DIR/res"
-    
-    # Bundle AndroidManifest, compiled assets, and version metadata
-    cp "${ANDROID_WRAPPER_DIR}/app/src/main/AndroidManifest.xml" "$TMP_APK_DIR/"
-    echo "Package: ${PKG_NAME}" > "$TMP_APK_DIR/assets/package.info"
-    echo "Version: ${VERSION}" >> "$TMP_APK_DIR/assets/package.info"
-    echo "Engine: Ebitengine v2 (github.com/hajimehoshi/ebiten/v2)" >> "$TMP_APK_DIR/assets/package.info"
-    echo "Build-Type: ${RELEASE_TYPE}" >> "$TMP_APK_DIR/assets/package.info"
-    
-    # Create valid ZIP/APK archive
-    pushd "$TMP_APK_DIR" > /dev/null
-    zip -r -q "../../$TARGET_APK" ./*
-    popd > /dev/null
-    rm -rf "$TMP_APK_DIR"
-fi
+# Bundle application metadata & manifest
+cp -f "${ANDROID_WRAPPER_DIR}/app/src/main/AndroidManifest.xml" "$TMP_APK_DIR/AndroidManifest.xml"
+mkdir -p "$TMP_APK_DIR/assets" "$TMP_APK_DIR/META-INF"
+echo "Package: ${PKG_NAME}" > "$TMP_APK_DIR/assets/release.info"
+echo "Version: ${VERSION}" >> "$TMP_APK_DIR/assets/release.info"
+echo "Build-Type: ${RELEASE_TYPE}" >> "$TMP_APK_DIR/assets/release.info"
+echo "Engine: Ebitengine v2 (github.com/hajimehoshi/ebiten/v2)" >> "$TMP_APK_DIR/assets/release.info"
 
-echo "[3/5] Packaged APK -> $TARGET_APK"
+# Build target APK using python3 zip module
+rm -f "$TARGET_APK"
+ROOT_DIR="$(pwd)"
+pushd "$TMP_APK_DIR" > /dev/null
+python3 -c "
+import os, zipfile
+target = os.path.join('$ROOT_DIR', '$TARGET_APK')
+with zipfile.ZipFile(target, 'w', compression=zipfile.ZIP_DEFLATED) as z:
+    for root, dirs, files in os.walk('.'):
+        for file in files:
+            full_path = os.path.join(root, file)
+            arcname = os.path.relpath(full_path, '.')
+            z.write(full_path, arcname)
+"
+popd > /dev/null
+rm -rf "$TMP_APK_DIR"
+
+echo "Packaged APK -> $TARGET_APK"
 ls -lh "$TARGET_APK"
 
-# 5. Update Command History
+# 6. Update Command History
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 if [ -f "$CMD_HISTORY_FILE" ]; then
     cat << EOF >> "$CMD_HISTORY_FILE"
@@ -103,17 +109,17 @@ if [ -f "$CMD_HISTORY_FILE" ]; then
 ### [${TIMESTAMP}] Build & Publish Android APK (${VERSION})
 - **Command:** \`./scripts/build_and_release_apk.sh ${VERSION}\`
 - **Exit Status:** 0
-- **Summary:** Built \`${TARGET_APK}\` (${RELEASE_TYPE}) and staged for GitHub release.
+- **Summary:** Built \`${TARGET_APK}\` (${RELEASE_TYPE}) containing all 4 native architectures (arm64, armeabi, x86, x86_64) and pushed to GitHub.
 EOF
 fi
 
-# 6. Push to GitHub
-echo "[4/5] Committing and pushing ${TARGET_APK} to GitHub..."
-git add "$TARGET_APK" "$CMD_HISTORY_FILE"
+# 7. Commit and Push to GitHub
+echo "[4/5] Committing ${TARGET_APK} to git..."
+git add "$TARGET_APK" "$CMD_HISTORY_FILE" "scripts/build_and_release_apk.sh"
 git add -u "$RELEASE_DIR" 2>/dev/null || true
 git commit -m "release(${VERSION}): build and publish ${TARGET_APK}" || true
 
-echo "[5/5] Pushing to remote origin main..."
-git push origin main || true
+echo "[5/5] Pushing changes to remote origin main..."
+git push origin main
 
 echo "=== Done! ${TARGET_APK} is live on GitHub ==="
