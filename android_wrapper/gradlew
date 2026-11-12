@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Attempt to set APP_BASE_NAME to the filename portion of the script's name.
+APP_BASE_NAME=`basename "$0"`
+APP_HOME="`pwd -P`"
+
+# Add default JVM options here.
+DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
+
+CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
+
+# Determine the Java command to use to start the JVM.
+if [ -n "$JAVA_HOME" ] ; then
+    if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
+        JAVACMD="$JAVA_HOME/jre/sh/java"
+    else
+        JAVACMD="$JAVA_HOME/bin/java"
+    fi
+else
+    JAVACMD="java"
+fi
+
+exec "$JAVACMD" "-Dorg.gradle.appname=$APP_BASE_NAME" -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain "$@"
