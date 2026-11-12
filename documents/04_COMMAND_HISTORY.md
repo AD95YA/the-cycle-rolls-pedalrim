@@ -98,3 +98,8 @@ All terminal commands executed during the development of **The Cycle Rolls: Peda
 - **Command:** `./scripts/build_and_release_apk.sh v1`
 - **Exit Status:** 0
 - **Summary:** Built `releases/pedalrim-v1.apk` (MAJOR (Permanent Artifact)) containing all 4 native architectures (arm64, armeabi, x86, x86_64) and pushed to GitHub.
+
+### [2026-11-12T13:20:36Z] Create Comprehensive Project README
+- **Command:** Created `README.md`
+- **Exit Status:** 0
+- **Summary:** Added comprehensive documentation covering game overview, controls, 6-speed derailleur mechanics, stamina/coasting physics, 4 neighborhood zones, 3-tier marble economy, Ship of Theseus garage upgrades, tips & tricks, build instructions, and the V2/V3 roadmap.
