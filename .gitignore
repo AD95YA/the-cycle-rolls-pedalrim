@@ -6,6 +6,8 @@ logs/
 
 # Temporary Go Mobile archives
 *.aar
+*.jar
+!android_wrapper/gradle/wrapper/gradle-wrapper.jar
 
 # Gradle & Android build caches
 .gradle/
@@ -14,6 +16,7 @@ android_wrapper/.gradle/
 android_wrapper/build/
 android_wrapper/app/build/
 android_wrapper/app/libs/*.aar
+android_wrapper/app/libs/*.jar
 local.properties
 
 # Explicitly track releases directory and release APKs
