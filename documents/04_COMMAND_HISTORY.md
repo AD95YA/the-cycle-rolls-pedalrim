@@ -118,3 +118,8 @@ All terminal commands executed during the development of **The Cycle Rolls: Peda
 - **Command:** `./scripts/build_and_release_apk.sh v1`
 - **Exit Status:** 0
 - **Summary:** Compiled valid signed Android APK `releases/pedalrim-v1.apk` (MAJOR (Permanent Artifact)) containing DEX bytecode (classes.dex), binary AndroidManifest (AXML), and all 4 native architectures (arm64-v8a, armeabi-v7a, x86, x86_64) via Gradle.
+
+### [2026-11-13T12:46:53Z] Build & Publish Android APK (v1)
+- **App:** The Cycle Rolls: Pedalrim (`game`)
+- **Command:** `./scripts/build_and_release_apk.sh v1`
+- **Artifact:** `releases/pedalrim-v1.apk` (MAJOR (Permanent Artifact))
