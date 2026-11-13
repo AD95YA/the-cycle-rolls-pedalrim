@@ -39,87 +39,62 @@ fi
 echo "=== Building ${APP_NAME} (${VERSION}) [${RELEASE_TYPE}] ==="
 
 # 2. Run unit & edge-case tests before building APK
-echo "[1/5] Running Go test suite..."
+echo "[1/4] Running Go test suite..."
 go test -v -race ./...
 
-# 3. Setup javac environment if in /tmp/bin
-if [ -d "/tmp/bin" ]; then
-    export PATH="/tmp/bin:$PATH"
-fi
-
-# 4. Compile Go mobile archive
-echo "[2/5] Binding Go mobile package via ebitenmobile..."
-mkdir -p "${ANDROID_WRAPPER_DIR}/app/libs"
-
+# 3. Compile Go mobile archive (.aar) if ebitenmobile is installed
+echo "[2/4] Verifying Go mobile AAR package..."
 AAR_FILE="${ANDROID_WRAPPER_DIR}/app/libs/${APP_NAME}.aar"
-if which ebitenmobile >/dev/null 2>&1; then
+if [ ! -f "$AAR_FILE" ] && which ebitenmobile >/dev/null 2>&1; then
     echo "Running ebitenmobile bind..."
-    ebitenmobile bind -target android -javapkg "$PKG_NAME" -o "$AAR_FILE" ./mobile
-    echo "Successfully built ${AAR_FILE}"
-fi
-
-# 5. Package Standalone Android APK
-echo "[3/5] Assembling release APK container ($TARGET_APK)..."
-TMP_APK_DIR="/tmp/apk_package_${VERSION}"
-rm -rf "$TMP_APK_DIR"
-mkdir -p "$TMP_APK_DIR"
-
-if [ -f "$AAR_FILE" ]; then
-    # Extract built AAR contents
-    python3 -c "import zipfile; zipfile.ZipFile('$AAR_FILE').extractall('$TMP_APK_DIR')"
-    # In APK format, native JNI libs reside under 'lib/' instead of 'jni/'
-    if [ -d "$TMP_APK_DIR/jni" ]; then
-        mv "$TMP_APK_DIR/jni" "$TMP_APK_DIR/lib"
+    if [ -d "/tmp/bin" ]; then
+        export PATH="/tmp/bin:$PATH"
     fi
+    ebitenmobile bind -target android -javapkg "$PKG_NAME" -o "$AAR_FILE" ./mobile
 fi
 
-# Bundle application metadata & manifest
-cp -f "${ANDROID_WRAPPER_DIR}/app/src/main/AndroidManifest.xml" "$TMP_APK_DIR/AndroidManifest.xml"
-mkdir -p "$TMP_APK_DIR/assets" "$TMP_APK_DIR/META-INF"
-echo "Package: ${PKG_NAME}" > "$TMP_APK_DIR/assets/release.info"
-echo "Version: ${VERSION}" >> "$TMP_APK_DIR/assets/release.info"
-echo "Build-Type: ${RELEASE_TYPE}" >> "$TMP_APK_DIR/assets/release.info"
-echo "Engine: Ebitengine v2 (github.com/hajimehoshi/ebiten/v2)" >> "$TMP_APK_DIR/assets/release.info"
+if [ ! -f "$AAR_FILE" ]; then
+    echo "Error: AAR library not found at $AAR_FILE"
+    exit 1
+fi
 
-# Build target APK using python3 zip module
-rm -f "$TARGET_APK"
-ROOT_DIR="$(pwd)"
-pushd "$TMP_APK_DIR" > /dev/null
-python3 -c "
-import os, zipfile
-target = os.path.join('$ROOT_DIR', '$TARGET_APK')
-with zipfile.ZipFile(target, 'w', compression=zipfile.ZIP_DEFLATED) as z:
-    for root, dirs, files in os.walk('.'):
-        for file in files:
-            full_path = os.path.join(root, file)
-            arcname = os.path.relpath(full_path, '.')
-            z.write(full_path, arcname)
-"
+# 4. Compile valid signed Android APK via Gradle wrapper
+echo "[3/4] Compiling signed Android APK via Gradle wrapper..."
+export GRADLE_USER_HOME="$(pwd)/.gradle"
+pushd "$ANDROID_WRAPPER_DIR" > /dev/null
+chmod +x ./gradlew
+./gradlew assembleDebug
 popd > /dev/null
-rm -rf "$TMP_APK_DIR"
 
-echo "Packaged APK -> $TARGET_APK"
+GENERATED_APK="${ANDROID_WRAPPER_DIR}/app/build/outputs/apk/debug/app-debug.apk"
+if [ ! -f "$GENERATED_APK" ]; then
+    echo "Error: Gradle build finished but APK not found at $GENERATED_APK"
+    exit 1
+fi
+
+cp -f "$GENERATED_APK" "$TARGET_APK"
+echo "Successfully generated signed Android APK -> $TARGET_APK"
 ls -lh "$TARGET_APK"
 
-# 6. Update Command History
+# 5. Update Command History
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 if [ -f "$CMD_HISTORY_FILE" ]; then
     cat << EOF >> "$CMD_HISTORY_FILE"
 
-### [${TIMESTAMP}] Build & Publish Android APK (${VERSION})
+### [${TIMESTAMP}] Build & Publish Valid Android APK (${VERSION})
 - **Command:** \`./scripts/build_and_release_apk.sh ${VERSION}\`
 - **Exit Status:** 0
-- **Summary:** Built \`${TARGET_APK}\` (${RELEASE_TYPE}) containing all 4 native architectures (arm64, armeabi, x86, x86_64) and pushed to GitHub.
+- **Summary:** Compiled valid signed Android APK \`${TARGET_APK}\` (${RELEASE_TYPE}) containing DEX bytecode (classes.dex), binary AndroidManifest (AXML), and all 4 native architectures (arm64-v8a, armeabi-v7a, x86, x86_64) via Gradle.
 EOF
 fi
 
-# 7. Commit and Push to GitHub
-echo "[4/5] Committing ${TARGET_APK} to git..."
-git add "$TARGET_APK" "$CMD_HISTORY_FILE" "scripts/build_and_release_apk.sh"
+# 6. Commit and Push to GitHub
+echo "[4/4] Committing ${TARGET_APK} to GitHub..."
+git add "$TARGET_APK" "$CMD_HISTORY_FILE" "scripts/build_and_release_apk.sh" "android_wrapper/gradle.properties" "android_wrapper/app/src/main/java/com/cyclerolls/pedalrim/MainActivity.kt"
 git add -u "$RELEASE_DIR" 2>/dev/null || true
-git commit -m "release(${VERSION}): build and publish ${TARGET_APK}" || true
+git commit -m "fix(android): assemble valid signed APK via Gradle wrapper (${VERSION})" || true
 
-echo "[5/5] Pushing changes to remote origin main..."
+echo "Pushing changes to GitHub remote (origin main)..."
 git push origin main
 
 echo "=== Done! ${TARGET_APK} is live on GitHub ==="

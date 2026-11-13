@@ -108,3 +108,8 @@ All terminal commands executed during the development of **The Cycle Rolls: Peda
 - **Command:** `git remote set-url origin https://github.com/AD95YA/the-cycle-rolls-pedalrim.git && git config user.name "AD95YA"`
 - **Exit Status:** 0
 - **Summary:** Updated git remote origin to `AD95YA` and updated user author name and documentation links across rules and README.
+
+### [2026-11-13T07:51:02Z] Build & Publish Valid Android APK (v1)
+- **Command:** `./scripts/build_and_release_apk.sh v1`
+- **Exit Status:** 0
+- **Summary:** Compiled valid signed Android APK `releases/pedalrim-v1.apk` (MAJOR (Permanent Artifact)) containing DEX bytecode (classes.dex), binary AndroidManifest (AXML), and all 4 native architectures (arm64-v8a, armeabi-v7a, x86, x86_64) via Gradle.

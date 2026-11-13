@@ -3,18 +3,19 @@ package com.cyclerolls.pedalrim
 import android.os.Bundle
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import com.cyclerolls.pedalrim.mobile.EbitenSurfaceView
+import com.cyclerolls.pedalrim.mobile.EbitenView
 
 class MainActivity : AppCompatActivity() {
-    private var ebitenView: EbitenSurfaceView? = null
+    private var ebitenView: EbitenView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialize and attach Ebiten SurfaceView to activity layout
-        ebitenView = EbitenSurfaceView(this)
+        // Initialize and attach public EbitenView to activity layout
+        val view = EbitenView(this)
+        ebitenView = view
         setContentView(
-            ebitenView,
+            view,
             ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
@@ -24,11 +25,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        ebitenView?.onPause()
+        ebitenView?.suspendGame()
     }
 
     override fun onResume() {
         super.onResume()
-        ebitenView?.onResume()
+        ebitenView?.resumeGame()
     }
 }
