@@ -17,6 +17,7 @@ type MeleeSide uint8
 const (
 	KickLeft MeleeSide = iota
 	KickRight
+	KickBothFlanks // Dual simultaneous flank attack executed by tandem crews
 )
 
 // ScrapInventory holds materials gathered from street sprints.
@@ -33,10 +34,12 @@ type CombatSystem interface {
 	// ExecuteSideKick triggers a left or right bicycle kick.
 	ExecuteSideKick(side MeleeSide, riderX, riderY, heading float64) (hitRivalID string, hitSuccess bool)
 
+	// ExecuteDualFlankStrike triggers simultaneous left and right attacks (Tandem Twins special).
+	ExecuteDualFlankStrike(riderX, riderY, heading float64) (hitLeft bool, hitRight bool)
+
 	// CraftWeapon constructs a scrap weapon if ingredients are available.
 	CraftWeapon(wType WeaponType, inv *ScrapInventory) (bool, error)
 
 	// FireActiveWeapon discharges the equipped weapon.
 	FireActiveWeapon(wType WeaponType, originX, originY, heading float64) error
 }
-

@@ -5,18 +5,21 @@ set -euo pipefail
 # PROJECT CONFIGURATION
 # ==============================================================================
 PROJECT_TYPE="game"                        # "game" (Ebitengine) or "app" (Fyne)
-APP_DISPLAY_NAME="The Cycle Rolls: Pedalrim"
-APK_BASE_NAME="pedalrim"
-PKG_NAME="com.cyclerolls.pedalrim"
-ICON_FILE="Icon.png"
-MOBILE_PKG_PATH="./mobile"
-ANDROID_WRAPPER_DIR="android_wrapper"
-RELEASE_DIR="releases"
+APP_DISPLAY_NAME="The Cycle Rolls: Pedalrim# Used for console output, logs, and Fyne -name
+APK_BASE_NAME="pedalrim"                 # Used for output APK filenames (e.g., ideamapper-v1.apk)
+PKG_NAME="com.cyclerolls.pedalrim"   # Android Application ID (-appID)
+ICON_FILE="Icon.png"                       # App icon passed to fyne package
+MOBILE_PKG_PATH="./mobile"                 # Unused when PROJECT_TYPE="app"
+ANDROID_WRAPPER_DIR="android_wrapper"      # Unused when PROJECT_TYPE="app"
+RELEASE_DIR="releases"                     # Output directory tracked in Git
 CMD_HISTORY_FILE="documents/04_COMMAND_HISTORY.md"
 # ==============================================================================
 
 if [ $# -lt 1 ]; then
-    echo "Usage: $0 <version>  (e.g., v1, v1.1, v2)"
+    echo "Usage: $0 <version>"
+    echo "Examples:"
+    echo "  $0 v1      -> ${RELEASE_DIR}/${APK_BASE_NAME}-v1.apk (permanent major release)"
+    echo "  $0 v1.1    -> ${RELEASE_DIR}/${APK_BASE_NAME}-v1-minor.apk (rolling minor release)"
     exit 1
 fi
 
@@ -46,12 +49,14 @@ else
     exit 1
 fi
 
+echo "App Name        : ${APP_DISPLAY_NAME}"
+echo "App ID          : ${PKG_NAME}"
 echo "Target Artifact : ${TARGET_APK}"
 echo "Release Policy  : ${RELEASE_TYPE}"
 echo "----------------------------------------------------------"
 
 # ------------------------------------------------------------------------------
-# 2. Auto-Detect Go, Java JDK (javac), Android SDK & NDK
+# 2. Auto-Detect Go, Java JDK (javac), Android SDK & NDK (Linux + WSL2 Paths)
 # ------------------------------------------------------------------------------
 export PATH="$PATH:/usr/local/go/bin:$HOME/go/bin"
 [ -d "/tmp/bin" ] && export PATH="/tmp/bin:$PATH"
@@ -115,7 +120,12 @@ fi
 if [ -n "${ANDROID_NDK_HOME:-}" ]; then
     echo "✔ Found Android NDK : $ANDROID_NDK_HOME"
 else
-    echo "✖ Error: ANDROID_NDK_HOME not found."
+    echo ""
+    echo "------------------------------------------------------------------------"
+    echo "✖ Error: ANDROID_NDK_HOME not found (required for physical device APKs)."
+    echo "  Install 'NDK (Side by side)' in Android Studio SDK Manager, or run:"
+    echo "    sdkmanager \"ndk;26.3.11579264\""
+    echo "------------------------------------------------------------------------"
     exit 1
 fi
 
@@ -169,10 +179,20 @@ elif [ "$PROJECT_TYPE_LOWER" == "app" ]; then
 
     echo "[2/4] Packaging Android APK via Fyne..."
     ICON_FLAG=()
-    [ -f "$ICON_FILE" ] && ICON_FLAG=(-icon "$ICON_FILE")
+    if [ -f "$ICON_FILE" ]; then
+        ICON_FLAG=(-icon "$ICON_FILE")
+    else
+        echo "⚠ Warning: ${ICON_FILE} not found; packaging with default Fyne icon."
+    fi
+
     fyne package -os android -appID "$PKG_NAME" -name "$APP_DISPLAY_NAME" "${ICON_FLAG[@]}"
 
     FYNE_OUTPUT_APK="${APP_DISPLAY_NAME}.apk"
+    if [ ! -f "$FYNE_OUTPUT_APK" ]; then
+        echo "✖ Error: Fyne build completed but '${FYNE_OUTPUT_APK}' was not found."
+        exit 1
+    fi
+
     mv -f "$FYNE_OUTPUT_APK" "$TARGET_APK"
     echo "[3/4] Moved Fyne APK -> ${TARGET_APK}"
 fi

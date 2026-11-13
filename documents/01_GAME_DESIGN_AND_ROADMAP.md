@@ -110,7 +110,11 @@ The street hierarchy is locked behind a fog-of-war roster. At the start, only ra
 - **#6 Golu "Deadweight":** Heavy heavyweight rider who sandbags in Gear 1 around tight corners, then unleashes terrifying downhill momentum.
 - **#5 Tanya "Switchblade":** Aggressive sprinter who cuts across your front tyre in corners and sideswipes in narrow alleys.
 - **#4 Dev "Mudguard":** Deliberately races on rainy days and kicks up blinding rooster-tails of mud along Lakeside Promenade.
-- **#3 Sameer "Draft":** Tucks directly behind the player's rear wheel, leeching slipstream speed before slingshotting at the finish line.
+- **#03 Rohan & Rahul "The Tandem Twins":**
+  - **Turf:** Township Outer Ring Road & Lakeside Straightaways.
+  - **Signature Bike:** Custom-Welded Chromoly Twin-Crank Tandem (extended wheelbase, dual synchronized chainrings).
+  - **Mechanics & Weakness:** Dual-pedaling grants extreme straight-line top speed and near-infinite stamina, while the rear twin attacks both flanks independently. Their weakness is a wide turning radius and heavy inertia on sharp Bazaar/Temple hairpins and wet Lakeside tiles.
+  - **Pink Slip Reward:** Unlocks the high-speed, wide-turning Tandem Frame in the Garage.
 - **#2 Zoya "Chain-Whip":** Ali's right-hand enforcer; lashes bicycle chains against guard rails to induce panic and force skids.
 - **#1 Ali "The Kingpin":** Master of all four zones, riding the player's stolen dream bike with flawless cornering, ruthless tactics, and customized gear ratios.
 

@@ -123,3 +123,8 @@ All terminal commands executed during the development of **The Cycle Rolls: Peda
 - **App:** The Cycle Rolls: Pedalrim (`game`)
 - **Command:** `./scripts/build_and_release_apk.sh v1`
 - **Artifact:** `releases/pedalrim-v1.apk` (MAJOR (Permanent Artifact))
+
+### [2026-11-13T14:34:00Z] Add Tandem Twins Boss to Blacklist V2 Specification
+- **Command:** Updated `documents/01_GAME_DESIGN_AND_ROADMAP.md`, `documents/01_DESIGN_AND_ROADMAP.md`, `internal/roadmap/blacklist.go`, `internal/roadmap/combat.go`, and `README.md`
+- **Exit Status:** 0
+- **Summary:** Added Blacklist Rank #03 Rohan & Rahul "The Tandem Twins" specification (Turf: Township Outer Ring Road & Lakeside Straightaways, Signature Bike: Custom-Welded Chromoly Twin-Crank Tandem, dual-pedaling speed/stamina mechanics, dual-flank attacks, hairpin/wet tile turning weaknesses, and Tandem Frame pink-slip garage unlock). Updated V2/V3 interface stubs `TandemTwinBossMechanics` and `ExecuteDualFlankStrike`.

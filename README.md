@@ -170,7 +170,7 @@ Pre-built APKs are tracked in the [releases/](releases/) directory:
 Specifications and clean modular Go interfaces are established in `internal/roadmap/` for future releases:
 
 - **Phase 2 — Prologue Sabotage Hook:** Opening race against reigning champion **#1 Ali "The Kingpin"** where Ali's crew sabotages your derailleur, forcing a chain snap and the pink-slip loss of your dream bike.
-- **Phase 2 — The Full Pedal: Blacklist:** 10-bully fog-of-war hierarchy (`#10 Adam "Training Wheels"` to `#1 Ali`), unique AI personalities (Kabir copying your bike, Golu sandbagging, Chintu snacking on samosas), 3-pillar unlock requirements (Race Wins + Commotion + Reputation), and dual endings (*People's Champion* vs. *New Kingpin*).
+- **Phase 2 — The Full Pedal: Blacklist:** 10-bully fog-of-war hierarchy (`#10 Adam "Training Wheels"` to `#1 Ali`), unique AI personalities (Kabir copying your bike, Golu sandbagging, Chintu snacking on samosas, and Rohan & Rahul "The Tandem Twins" dual-pedaling on a custom tandem), 3-pillar unlock requirements (Race Wins + Commotion + Reputation), and dual endings (*People's Champion* vs. *New Kingpin*).
 - **Phase 3 — Side-by-Side Melee Combat & Scrap Crafting:** Left/right kicks and crafted weapons (Bamboo Stick, Slingshot, Water Balloon, Airhorn) built from race scrap.
 - **Phase 3 — 5-Level Adult Pursuit System:** Heat Levels 1–5 (Watchmen $\to$ Shopkeepers $\to$ Uncle on Chetak Moped $\to$ Gate Blockades $\to$ Parents in Maruti 800), destructible Pursuit Breakers, Cooldown Hiding Spots, and BUSTED/GROUNDED weapon confiscation.
 - **Phase 3 — Ambient Banter & Cycle Bell:** Blind-spot handlebar bell bonuses at society gates and deadpan NPC speech bubbles (*"Must have been the wind..."*).

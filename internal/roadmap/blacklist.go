@@ -11,7 +11,8 @@ const (
 	Rank6Golu         BlacklistRank = 6  // Golu "Deadweight"
 	Rank5Tanya        BlacklistRank = 5  // Tanya "Switchblade"
 	Rank4Dev          BlacklistRank = 4  // Dev "Mudguard"
-	Rank3Sameer       BlacklistRank = 3  // Sameer "Draft"
+	Rank3TandemTwins  BlacklistRank = 3  // Rohan & Rahul "The Tandem Twins"
+	Rank3Sameer                     = Rank3TandemTwins // Backwards-compatible alias
 	Rank2Zoya         BlacklistRank = 2  // Zoya "Chain-Whip"
 	Rank1AliKingpin   BlacklistRank = 1  // Ali "The Kingpin"
 )
@@ -27,7 +28,8 @@ const (
 	BossAIDeadweightSandbagger
 	BossAISideswiper
 	BossAIMudRooster
-	BossAISlipstreamDrafter
+	BossAITandemDualPedal
+	BossAISlipstreamDrafter = BossAITandemDualPedal // Backwards-compatible alias
 	BossAIChainWhipper
 	BossAIKingpinMastery
 )
@@ -40,14 +42,18 @@ type UnlockPillars struct {
 }
 
 // BullyProfile represents a Blacklist boss entry.
+// Struct fields ordered from largest to smallest for cache line alignment.
 type BullyProfile struct {
-	Rank               BlacklistRank
 	Name               string
 	Alias              string
 	HomeZone           string
 	GimmickDescription string
-	AIType             BossAIType
+	SignatureBike      string
+	Weakness           string
+	PinkSlipReward     string
 	Requirements       UnlockPillars
+	Rank               BlacklistRank
+	AIType             BossAIType
 	IsRevealed         bool // Fog-of-war reveal state
 	IsDefeated         bool
 }
@@ -60,6 +66,21 @@ const (
 	EndingPeoplesChampion // Free streets, return confiscated bikes, open community racing
 	EndingNewKingpin      // Keep Ali's stolen bike, rule Pedalrim with iron grip
 )
+
+// TandemTwinBossMechanics specifies the V2/V3 interface for the Tandem Twins boss encounter.
+type TandemTwinBossMechanics interface {
+	// CalculateStraightLineSpeed returns the dual-pedaling velocity multiplier on straightaways.
+	CalculateStraightLineSpeed(currentSpeed float64) float64
+
+	// TriggerFlankStrike evaluates if the rear twin strikes a player rider attempting to pass on either flank.
+	TriggerFlankStrike(playerX, playerY, tandemX, tandemY, heading float64) (strikeSide MeleeSide, didHit bool)
+
+	// ApplyHairpinPenalty applies turning radius widening and heavy lateral sliding on sharp turns and wet tiles.
+	ApplyHairpinPenalty(turnAngleDelta float64, tileGrip float64) (clampedTurnDelta float64, lateralSlide float64)
+
+	// UnlockTandemFrame awards the Tandem Frame component upon boss defeat.
+	UnlockTandemFrame() (frameID string, unlocked bool)
+}
 
 // BlacklistManager specifies the progression contract for The Full Pedal: Blacklist.
 type BlacklistManager interface {
@@ -75,4 +96,3 @@ type BlacklistManager interface {
 	// DetermineEnding calculates the ending based on net community reputation.
 	DetermineEnding(finalReputation int) DualEnding
 }
-
